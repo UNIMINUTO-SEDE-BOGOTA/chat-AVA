@@ -1,26 +1,10 @@
-# AVA Chat Secure Edition
+# 🦊 Ecosistema AVA
 
-Aplicación web estática de chat para AVA.
+Asistente virtual inteligente con chat integrado.
 
-## Estructura
+## Iniciar proyecto
 
-- index.html
-- assets/css/main.css
-- assets/js/app.js
-
-## Funciones principales
-
-- Gestión de chats con guardado local
-- Eliminación de chat con opción de deshacer
-- Categorías de atención y simulador de auditorías
-- Conexión por webhook según categoría
-- Tema claro/oscuro
-
-## Uso local
-
-- Abrir index.html en el navegador
-
-## Configuración
-
-- Editar assets/js/app.js
-- Configurar CATEGORY_WEBHOOKS con los webhooks de cada categoría
+```bash
+npm install
+npm run dev
+```
