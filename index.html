@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVA - Agente Virtual de Auditoría</title>
+    <link rel="stylesheet" href="./assets/css/main.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="createNewChat()">
+                ➕ Nuevo chat
+            </button>
+        </div>
+        <div class="chats-list" id="chatsList">
+            <!-- Chats se agregan dinámicamente -->
+        </div>
+    </div>
+    <!-- Main Chat -->
+<div class="chat-container">
+    <div class="chat-header">
+        <h1 id="chatTitle">Nuevo chat</h1>
+        <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Cambiar tema">
+            🌙
+        </button>
+    </div>
+
+    <div class="messages-container" id="messagesContainer">
+        <!-- Pantalla de bienvenida -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <div class="robot-icon">🤖</div>
+            <h2>Hola, Soy AVA</h2>
+            <p>Selecciona una categoría para comenzar</p>
+            <div class="categories-grid">
+                <button class="category-btn" onclick="selectCategory('capacitacion')">
+                    <span class="icon">🧠</span>
+                    Capacitación SGC en UNIMINUTO
+                </button>
+                <button class="category-btn" onclick="selectCategory('consulta')">
+                    <span class="icon">📘</span>
+                    Consulta Técnica ISO 9001:2015
+                </button>
+                <button class="category-btn" onclick="selectCategory('simulador')">
+                    <span class="icon">💡</span>
+                    Simulador de Auditorías
+                </button>
+                <button class="category-btn" onclick="selectCategory('gestion')">
+                    <span class="icon">📊</span>
+                    Gestión de No Conformidades
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="input-wrapper disabled" id="inputWrapper">
+            <input 
+                type="text" 
+                class="message-input" 
+                id="messageInput"
+                placeholder="Escribe tu mensaje..."
+                onkeypress="handleKeyPress(event)"
+                disabled
+            >
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                ➤
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="./assets/js/app.js" defer></script>
+
+<div class="undo-toast hidden" id="undoToast" role="status" aria-live="polite">
+    <span class="undo-toast-text" id="undoToastText">Chat eliminado</span>
+    <button class="undo-toast-btn" id="undoToastBtn" type="button" onclick="undoDeleteChat()">Deshacer</button>
+</div>
+</body>
+</html>
+
