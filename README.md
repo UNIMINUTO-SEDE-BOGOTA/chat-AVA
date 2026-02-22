@@ -1,13 +1,12 @@
 # AVA Chat Secure Edition
 
-Aplicación web de chat para AVA con categorías, múltiples conversaciones, tema claro/oscuro y almacenamiento local.
+Aplicación web estática de chat para AVA.
 
 ## Estructura
 
 - index.html
 - assets/css/main.css
 - assets/js/app.js
-- server.js
 
 ## Funciones principales
 
@@ -19,14 +18,7 @@ Aplicación web de chat para AVA con categorías, múltiples conversaciones, tem
 
 ## Uso local
 
-1. Instalar dependencias
-2. Iniciar servidor
-3. Abrir la app en navegador
-
-Comandos:
-
-npm install
-npm start
+- Abrir index.html en el navegador
 
 ## Configuración
 
