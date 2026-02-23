@@ -62,14 +62,32 @@
         };
     }
 
+    function ensureChatSessionId(chat) {
+        if (!chat) return '';
+        if (!chat.sessionId) {
+            chat.sessionId = generateSessionId();
+            console.log('SessionId regenerado para chat:', chat.sessionId);
+            saveChatsToStorage();
+        }
+        return chat.sessionId;
+    }
+
     function createNewChat() {
         const chat = createBaseChat();
-        console.log('Nuevo chat creado:', chat.sessionId);
+        currentChatId = chat.id;
+        console.log('Nuevo chat:', currentChatId);
 
         chats.unshift(chat);
         saveChatsToStorage();
         renderChatsList();
-        loadChat(chat.id);
+        loadChat(currentChatId);
+    }
+
+    function ensureActiveChat() {
+        if (!currentChatId || !chats.some(chat => chat.id === currentChatId)) {
+            createNewChat();
+        }
+        return getCurrentChat();
     }
 
     function deleteChat(chatId, event) {
@@ -288,7 +306,14 @@
     }
 
     async function sendToN8N(message, chat) {
+        if (!currentChatId) {
+            createNewChat();
+            chat = getCurrentChat();
+            if (!chat) return;
+        }
+
         const WEBHOOK_URL = getWebhookForCategory(chat.category);
+        const sessionId = currentChatId;
 
         if (!WEBHOOK_URL) {
             chat.messages.push({
@@ -304,16 +329,20 @@
         showTypingIndicator();
         
         try {
+            const payload = {
+                message: message,
+                proceso: '',
+                subproceso: '',
+                sessionId: sessionId,
+                category: chat.category
+            };
+
+            console.log('Payload a n8n (selectProcess):', payload);
+
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: message,
-                    proceso: '',
-                    subproceso: '',
-                    sessionId: chat.sessionId,
-                    category: chat.category
-                })
+                body: JSON.stringify(payload)
             });
 
             const data = await response.json();
@@ -349,8 +378,9 @@
 
         if (!message || isSending) return;
 
-        const chat = getCurrentChat();
+        const chat = ensureActiveChat();
         if (!chat) return;
+        const sessionId = currentChatId;
 
         const categoryWebhook = getWebhookForCategory(chat.category);
 
@@ -387,6 +417,16 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
+            const payload = {
+                message: message,
+                proceso: chat.process || '',
+                subproceso: '',
+                sessionId: sessionId,
+                category: chat.category
+            };
+
+            console.log('Payload a n8n (sendMessage):', payload);
+
             // Enviar al webhook
             const response = await fetch(categoryWebhook, {
                 method: 'POST',
@@ -394,13 +434,7 @@
                     'Content-Type': 'application/json'
                 },
                 signal: controller.signal,
-                body: JSON.stringify({
-                    message: message,
-                    proceso: chat.process || '',
-                    subproceso: '',
-                    sessionId: chat.sessionId,
-                    category: chat.category
-                })
+                body: JSON.stringify(payload)
             });
 
             clearTimeout(timeoutId);
