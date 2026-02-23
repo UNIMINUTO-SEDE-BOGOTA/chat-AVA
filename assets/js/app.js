@@ -42,9 +42,17 @@
         return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
 
+    function generateSessionId() {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            return window.crypto.randomUUID();
+        }
+        return `session-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
     function createBaseChat() {
         return {
             id: generateChatId(),
+            sessionId: generateSessionId(),
             title: 'Nuevo chat',
             messages: [],
             category: null,
@@ -56,6 +64,7 @@
 
     function createNewChat() {
         const chat = createBaseChat();
+        console.log('Nuevo chat creado:', chat.sessionId);
 
         chats.unshift(chat);
         saveChatsToStorage();
@@ -302,7 +311,7 @@
                     message: message,
                     proceso: '',
                     subproceso: '',
-                    sessionId: chat.id,
+                    sessionId: chat.sessionId,
                     category: chat.category
                 })
             });
@@ -389,7 +398,7 @@
                     message: message,
                     proceso: chat.process || '',
                     subproceso: '',
-                    sessionId: chat.id,
+                    sessionId: chat.sessionId,
                     category: chat.category
                 })
             });
@@ -690,7 +699,13 @@
 
         try {
             const parsed = JSON.parse(stored);
-            chats = Array.isArray(parsed) ? parsed : [];
+            chats = Array.isArray(parsed)
+                ? parsed.map(chat => ({
+                    ...chat,
+                    id: chat?.id || generateChatId(),
+                    sessionId: chat?.sessionId || generateSessionId()
+                }))
+                : [];
         } catch (error) {
             console.warn('No se pudo parsear ava_chats. Se reinicia el almacenamiento.', error);
             chats = [];
