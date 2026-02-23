@@ -262,25 +262,73 @@
 
         chat.process = process;
 
-        // Mensaje del usuario (simulado)
+        // Mensaje del usuario
         const userMessage = {
             role: 'user',
             content: process,
             timestamp: new Date().toISOString()
         };
         chat.messages.push(userMessage);
-
-        // Mensaje de confirmación del bot
-        const confirmMessage = {
-            role: 'assistant',
-            content: `Perfecto, comenzaremos con la auditoría del proceso de **${process}**. ¿Qué aspecto del proceso quieres revisar?`,
-            timestamp: new Date().toISOString()
-        };
-        chat.messages.push(confirmMessage);
-
-        updateChatState('chatting');
-        saveChatsToStorage();
         renderMessages(chat);
+        saveChatsToStorage();
+
+        // ========================================
+        // ENVIAR A N8N (NUEVO)
+        // ========================================
+        sendToN8N(process, chat);
+    }
+
+    async function sendToN8N(message, chat) {
+        const WEBHOOK_URL = getWebhookForCategory(chat.category);
+
+        if (!WEBHOOK_URL) {
+            chat.messages.push({
+                role: 'assistant',
+                content: '⚠️ Esta categoría no tiene webhook configurado. Actualiza CATEGORY_WEBHOOKS en app.js.',
+                timestamp: new Date().toISOString()
+            });
+            renderMessages(chat);
+            saveChatsToStorage();
+            return;
+        }
+
+        showTypingIndicator();
+        
+        try {
+            const response = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message,
+                    proceso: '',
+                    subproceso: '',
+                    sessionId: chat.id,
+                    category: chat.category
+                })
+            });
+
+            const data = await response.json();
+
+            const botMessage = {
+                role: 'assistant',
+                content: data.respuesta || data.message?.content || 'Error',
+                timestamp: new Date().toISOString()
+            };
+            chat.messages.push(botMessage);
+
+        } catch (error) {
+            console.error('Error:', error);
+            chat.messages.push({
+                role: 'assistant',
+                content: 'Error al conectar con el servidor',
+                timestamp: new Date().toISOString()
+            });
+        } finally {
+            hideTypingIndicator();
+            updateChatState('chatting');
+            renderMessages(chat);
+            saveChatsToStorage();
+        }
     }
 
     // ========================================
@@ -537,6 +585,15 @@
         const input = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const wrapper = document.getElementById('inputWrapper');
+        const inputContainer = document.getElementById('inputContainer');
+
+        if (inputContainer) {
+            if (currentState === 'welcome') {
+                inputContainer.classList.add('hidden');
+            } else {
+                inputContainer.classList.remove('hidden');
+            }
+        }
 
         if (currentState === 'chatting' && !isSending) {
             input.disabled = false;
