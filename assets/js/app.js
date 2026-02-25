@@ -705,10 +705,16 @@
     }
 
     function extractAssistantReply(data) {
+        console.log('Respuesta cruda de N8N:', JSON.stringify(data));
         if (typeof data === 'string' && data.trim()) return data;
         if (data?.respuesta) return data.respuesta;
+        if (data?.output) return data.output;
+        if (data?.text) return data.text;
+        if (data?.response) return data.response;
         if (data?.message?.content) return data.message.content;
         if (data?.message && typeof data.message === 'string') return data.message;
+        if (Array.isArray(data) && data[0]?.respuesta) return data[0].respuesta;
+        if (Array.isArray(data) && data[0]?.output) return data[0].output;
         return 'Lo siento, no pude procesar tu solicitud.';
     }
 
