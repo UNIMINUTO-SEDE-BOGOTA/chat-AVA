@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AVA - Agente Virtual de Auditoría</title>
+    <link rel="icon" type="image/png" href="./assets/images/icon-ava.png">
     <link rel="stylesheet" href="./assets/css/main.css">
 </head>
 <body>
@@ -17,20 +18,20 @@
         <div class="chats-list" id="chatsList">
             <!-- Chats se agregan dinámicamente -->
         </div>
+        <div class="sidebar-decorative">
+            <img src="./assets/images/ava-mascota.png" alt="AVA" class="sidebar-ava-image">
+        </div>
     </div>
     <!-- Main Chat -->
 <div class="chat-container">
     <div class="chat-header">
         <h1 id="chatTitle">Nuevo chat</h1>
-        <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Cambiar tema">
-            🌙
-        </button>
     </div>
 
     <div class="messages-container" id="messagesContainer">
         <!-- Pantalla de bienvenida -->
         <div class="welcome-screen" id="welcomeScreen">
-            <div class="robot-icon">🤖</div>
+            <img src="./assets/images/icon-ava.png" alt="Icono AVA" class="robot-icon">
             <h2>Hola, Soy AVA</h2>
             <p>Selecciona una categoría para comenzar</p>
             <div class="categories-grid">
@@ -68,6 +69,7 @@
                 ➤
             </button>
         </div>
+        <p class="chat-disclaimer">AVA puede cometer errores. Verifica siempre la información crítica antes de tomar decisiones.</p>
     </div>
 </div>
 

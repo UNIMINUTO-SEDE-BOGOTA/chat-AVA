@@ -8,7 +8,6 @@
         gestion: 'https://TU_N8N_URL/webhook/GESTION_ID'
     };
     const REQUEST_TIMEOUT_MS = 15000;
-    const THEME_STORAGE_KEY = 'ava_theme';
     const DELETE_UNDO_TIMEOUT_MS = 5000;
 
     // Estado global
@@ -23,7 +22,7 @@
     // INICIALIZACIÓN
     // ========================================
     function init() {
-        initTheme();
+        document.body.removeAttribute('data-theme');
         loadChatsFromStorage();
         if (chats.length === 0) {
             createNewChat();
@@ -515,14 +514,27 @@
 
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
-        avatar.textContent = message.role === 'user' ? '👤' : '🤖';
+        if (message.role === 'user') {
+            avatar.textContent = 'TÚ';
+        } else {
+            avatar.innerHTML = '<img src="./assets/images/icon-ava.png" alt="AVA">';
+        }
+
+        const body = document.createElement('div');
+        body.className = 'message-body';
+
+        const label = document.createElement('div');
+        label.className = 'message-label';
+        label.textContent = message.role === 'user' ? 'Usuario' : 'AVA';
 
         const content = document.createElement('div');
         content.className = 'message-content';
         content.innerHTML = formatMessage(message.content);
 
+        body.appendChild(label);
+        body.appendChild(content);
         messageDiv.appendChild(avatar);
-        messageDiv.appendChild(content);
+        messageDiv.appendChild(body);
         container.appendChild(messageDiv);
     }
 
@@ -574,46 +586,21 @@
         });
     }
 
-    function initTheme() {
-        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-        const preferredTheme =
-            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-                ? 'dark'
-                : 'light';
-
-        const theme = savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : preferredTheme;
-        applyTheme(theme);
-    }
-
-    function applyTheme(theme) {
-        document.body.setAttribute('data-theme', theme);
-        localStorage.setItem(THEME_STORAGE_KEY, theme);
-
-        const toggleBtn = document.getElementById('themeToggleBtn');
-        if (toggleBtn) {
-            const isDark = theme === 'dark';
-            toggleBtn.textContent = isDark ? '☀️' : '🌙';
-            toggleBtn.setAttribute('aria-label', isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
-        }
-    }
-
-    function toggleTheme() {
-        const currentTheme = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    }
-
     function showTypingIndicator() {
         const container = document.getElementById('messagesContainer');
         const indicator = document.createElement('div');
         indicator.className = 'message assistant';
         indicator.id = 'typingIndicator';
         indicator.innerHTML = `
-            <div class="message-avatar">🤖</div>
-            <div class="message-content">
-                <div class="typing-indicator">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
+            <div class="message-avatar"><img src="./assets/images/icon-ava.png" alt="AVA"></div>
+            <div class="message-body">
+                <div class="message-label">AVA</div>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
                 </div>
             </div>
         `;
@@ -657,12 +644,32 @@
     }
 
     function formatMessage(text) {
-        const escapedText = escapeHtml(String(text ?? ''));
+        const rawText = String(text ?? '');
+        const codeBlocks = [];
 
-        // Formato básico de markdown seguro
-        return escapedText
+        const textWithoutCodeBlocks = rawText.replace(/```([\s\S]*?)```/g, (_, code) => {
+            const token = `__CODE_BLOCK_${codeBlocks.length}__`;
+            codeBlocks.push(`<pre><code>${escapeHtml(code.trim())}</code></pre>`);
+            return token;
+        });
+
+        let formatted = escapeHtml(textWithoutCodeBlocks)
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+            .replace(/(https?:\/\/[^\s<]+)/g, (url) => {
+                const cleanUrl = url.replace(/[),.;]$/, '');
+                const trailing = url.slice(cleanUrl.length);
+                const isDocument = /\.(pdf|doc|docx|xls|xlsx|ppt|pptx)$/i.test(cleanUrl);
+                const linkClass = isDocument ? ' class="doc-link"' : '';
+                return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer"${linkClass}>${isDocument ? '📄 ' : ''}${cleanUrl}</a>${trailing}`;
+            })
             .replace(/\n/g, '<br>');
+
+        codeBlocks.forEach((block, index) => {
+            formatted = formatted.replace(`__CODE_BLOCK_${index}__`, block);
+        });
+
+        return formatted;
     }
 
     function escapeHtml(text) {
