@@ -331,10 +331,11 @@
         try {
             const payload = {
                 message: message,
-                proceso: '',
+                proceso: message,
                 subproceso: '',
                 sessionId: sessionId,
-                category: chat.category
+                category: chat.category,
+                esSeleccionProceso: true
             };
 
             console.log('Payload a n8n (selectProcess):', payload);
@@ -422,7 +423,8 @@
                 proceso: chat.process || '',
                 subproceso: '',
                 sessionId: sessionId,
-                category: chat.category
+                category: chat.category,
+                esSeleccionProceso: false
             };
 
             console.log('Payload a n8n (sendMessage):', payload);
