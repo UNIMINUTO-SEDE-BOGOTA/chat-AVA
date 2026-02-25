@@ -28,6 +28,10 @@
     // INICIALIZACIÓN
     // ========================================
     function init() {
+        const chatTitle = document.getElementById('chatTitle');
+        if (chatTitle) {
+            chatTitle.textContent = 'AVA';
+        }
         document.body.removeAttribute('data-theme');
         loadChatsFromStorage();
         if (chats.length === 0) {
