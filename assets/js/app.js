@@ -207,7 +207,6 @@
         currentState = chat.state;
         
         // Actualizar UI
-        document.getElementById('chatTitle').textContent = chat.title;
         renderMessages(chat);
         updateInputState();
         renderChatsList();
@@ -248,7 +247,6 @@
 
         // Mapeo de categorías
         chat.title = CATEGORY_NAMES[category];
-        document.getElementById('chatTitle').textContent = chat.title;
 
         // Mensaje de bienvenida del bot
         const welcomeMessage = {
@@ -654,13 +652,6 @@
         if (!suggestedTitle) return;
 
         chat.title = suggestedTitle;
-
-        if (chat.id === currentChatId) {
-            const chatTitle = document.getElementById('chatTitle');
-            if (chatTitle) {
-                chatTitle.textContent = suggestedTitle;
-            }
-        }
     }
 
     function buildChatTitleFromUserText(userText) {

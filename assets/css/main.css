@@ -170,6 +170,19 @@ body {
     text-overflow: ellipsis;
 }
 
+.chat-header .chat-brand {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1;
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 48%, #ea580c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
+}
+
 .messages-container {
     flex: 1;
     overflow-y: auto;
@@ -189,9 +202,10 @@ body {
 }
 
 .robot-icon {
-    width: 104px;
-    height: 104px;
+    width: 72px;
+    height: 72px;
     object-fit: contain;
+    object-position: center;
     margin-bottom: 16px;
 }
 
@@ -401,6 +415,9 @@ body {
     padding: 14px 24px 20px;
     border-top: 1px solid var(--border-soft);
     background: var(--bg-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .input-wrapper {
@@ -458,8 +475,8 @@ body {
 }
 
 .chat-disclaimer {
-    width: min(760px, 100%);
-    margin: 8px auto 0;
+    width: min(760px, calc(100% - 8px));
+    margin: 8px 0 0;
     font-size: 11px;
     line-height: 1.45;
     font-style: italic;
