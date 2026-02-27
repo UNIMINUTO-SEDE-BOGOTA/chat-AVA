@@ -7,6 +7,30 @@
         simulador: 'https://n8necosystem-amdxgsdnd3dgewaj.centralus-01.azurewebsites.net/webhook/4c16333e-fdf5-4c86-b6b2-35bf5f0493f0',
         gestion: 'https://TU_N8N_URL/webhook/GESTION_ID'
     };
+    const PROCESOS = {
+        'Docencia': [
+            'Enseñanza, Aprendizaje y Evaluación',
+            'Vida Estudiantil',
+            'Desarrollo Curricular',
+            'Evaluación Docente',
+            'Planeación Académica'
+        ],
+        'Investigación': [
+            'Investigación Formativa',
+            'I+D+I+C',
+            'Publicaciones',
+            'Gestión de Proyectos',
+            'Grupos de Investigación',
+            'Semilleros'
+        ],
+        'Proyección Social': [
+            'Educación Continua',
+            'Gestión de Empleabilidad',
+            'Proyectos Sociales',
+            'Prácticas Profesionales',
+            'Responsabilidad Social'
+        ]
+    };
     const CATEGORY_NAMES = {
         capacitacion: 'Capacitación SGC en UNIMINUTO',
         consulta: 'Consulta Técnica ISO 9001:2015',
@@ -66,6 +90,7 @@
             messages: [],
             category: null,
             process: null,
+            macroproceso: null,
             state: 'welcome',
             createdAt: new Date().toISOString()
         };
@@ -283,26 +308,22 @@
     // ========================================
     // SELECCIÓN DE PROCESO
     // ========================================
-    function selectProcess(process) {
+    function selectProcess(subproceso, macroproceso) {
         const chat = getCurrentChat();
         if (!chat) return;
 
-        chat.process = process;
+        chat.process = subproceso;
+        chat.macroproceso = macroproceso;
 
-        // Mensaje del usuario
         const userMessage = {
             role: 'user',
-            content: process,
+            content: `${macroproceso} → ${subproceso}`,
             timestamp: new Date().toISOString()
         };
         chat.messages.push(userMessage);
         renderMessages(chat);
         saveChatsToStorage();
-
-        // ========================================
-        // ENVIAR A N8N (NUEVO)
-        // ========================================
-        sendToN8N(process, chat);
+        sendToN8N(subproceso, chat);
     }
 
     async function sendToN8N(message, chat) {
@@ -332,10 +353,10 @@
             const payload = {
                 message: message,
                 proceso: message,
+                macroproceso: chat.macroproceso || '',
                 subproceso: '',
                 sessionId: sessionId,
-                category: chat.category,
-                esSeleccionProceso: true
+                category: chat.category
             };
 
             console.log('Payload a n8n (selectProcess):', payload);
@@ -423,6 +444,7 @@
             const payload = {
                 message: message,
                 proceso: chat.process || '',
+                macroproceso: chat.macroproceso || '',
                 subproceso: '',
                 sessionId: sessionId,
                 category: chat.category,
@@ -543,23 +565,43 @@
 
     function renderProcessSelection() {
         const container = document.getElementById('messagesContainer');
+        const existing = document.getElementById('processSelectionDiv');
+        if (existing) existing.remove();
+
         const selectionDiv = document.createElement('div');
         selectionDiv.className = 'process-selection';
+        selectionDiv.id = 'processSelectionDiv';
         selectionDiv.innerHTML = `
-            <div class="process-selection-title">📋 Selecciona el proceso a auditar:</div>
+            <div class="process-selection-title">📋 Selecciona el macroproceso a auditar:</div>
             <div class="process-buttons">
-                <button class="process-btn" onclick="selectProcess('Investigación')">
-                    🔬 Investigación
-                </button>
-                <button class="process-btn" onclick="selectProcess('Docencia')">
-                    📚 Docencia
-                </button>
-                <button class="process-btn" onclick="selectProcess('Proyección Social')">
-                    🌍 Proyección Social
-                </button>
+                ${Object.keys(PROCESOS).map(macro => `
+                    <button class="process-btn" onclick="selectMacroproceso('${macro}')">
+                        ${macro}
+                    </button>
+                `).join('')}
             </div>
         `;
         container.appendChild(selectionDiv);
+    }
+
+    function selectMacroproceso(macro) {
+        const selectionDiv = document.getElementById('processSelectionDiv');
+        if (!selectionDiv) return;
+        const subprocesos = PROCESOS[macro];
+
+        selectionDiv.innerHTML = `
+            <div class="process-selection-title">📋 Macroproceso: <strong>${macro}</strong><br>Selecciona tu subproceso específico:</div>
+            <div class="process-buttons">
+                ${subprocesos.map(sub => `
+                    <button class="process-btn" onclick="selectProcess('${sub}', '${macro}')">
+                        ${sub}
+                    </button>
+                `).join('')}
+                <button class="process-btn" onclick="renderProcessSelection()" style="background: var(--bg-secondary); color: var(--text-primary);">
+                    ← Volver
+                </button>
+            </div>
+        `;
     }
 
     function renderChatsList() {
