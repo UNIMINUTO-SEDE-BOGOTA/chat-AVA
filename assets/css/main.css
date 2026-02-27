@@ -558,6 +558,41 @@ body {
     background: var(--accent-hover);
 }
 
+.update-banner {
+    position: fixed;
+    right: 20px;
+    bottom: 70px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-soft);
+    background: var(--bg-main);
+    color: var(--text-main);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    z-index: 998;
+}
+
+.update-banner-text {
+    font-size: 13px;
+}
+
+.update-banner-btn {
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.update-banner-btn:hover {
+    background: var(--accent-hover);
+}
+
 @media (max-width: 900px) {
     .sidebar {
         width: 232px;
@@ -611,6 +646,13 @@ body {
         left: 12px;
         right: 12px;
         bottom: 12px;
+        justify-content: space-between;
+    }
+
+    .update-banner {
+        left: 12px;
+        right: 12px;
+        bottom: 62px;
         justify-content: space-between;
     }
 }

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="app-build-id" content="2026-02-26-001">
     <title>AVA - Agente Virtual de Auditoría</title>
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/icon-ava.png?v=2">
     <link rel="shortcut icon" href="./assets/images/icon-ava.png?v=2">
@@ -79,6 +80,11 @@
 <div class="undo-toast hidden" id="undoToast" role="status" aria-live="polite">
     <span class="undo-toast-text" id="undoToastText">Chat eliminado</span>
     <button class="undo-toast-btn" id="undoToastBtn" type="button" onclick="undoDeleteChat()">Deshacer</button>
+</div>
+
+<div class="update-banner hidden" id="updateBanner" role="status" aria-live="polite">
+    <span class="update-banner-text" id="updateBannerText">Hay una nueva versión de AVA disponible.</span>
+    <button class="update-banner-btn" type="button" onclick="applyAppUpdate()">Actualizar</button>
 </div>
 </body>
 </html>

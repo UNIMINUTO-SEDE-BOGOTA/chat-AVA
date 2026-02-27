@@ -39,6 +39,9 @@
     };
     const REQUEST_TIMEOUT_MS = 15000;
     const DELETE_UNDO_TIMEOUT_MS = 5000;
+    const UPDATE_CHECK_INTERVAL_MS = 120000;
+    const VERSION_MANIFEST_URL = './version.json';
+    const CURRENT_BUILD_ID = document.querySelector('meta[name="app-build-id"]')?.getAttribute('content') || 'dev';
 
     // Estado global
     let chats = [];
@@ -47,6 +50,8 @@
     let isSending = false;
     let pendingDeletedChat = null;
     let pendingDeleteTimerId = null;
+    let latestAvailableBuildId = '';
+    let updateCheckTimerId = null;
 
     // ========================================
     // INICIALIZACIÓN
@@ -63,6 +68,81 @@
         } else {
             loadChat(chats[0].id);
         }
+
+        setupUpdateChecker();
+    }
+
+    async function checkForAppUpdate({ silent = true } = {}) {
+        try {
+            const response = await fetch(`${VERSION_MANIFEST_URL}?t=${Date.now()}`, {
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const payload = await response.json();
+            const remoteBuildId = String(payload?.buildId || '').trim();
+
+            if (!remoteBuildId || remoteBuildId === CURRENT_BUILD_ID) {
+                hideUpdateBanner();
+                return;
+            }
+
+            latestAvailableBuildId = remoteBuildId;
+            showUpdateBanner(payload?.deployedAt || '');
+
+            if (!silent) {
+                console.log(`Nueva versión detectada: ${remoteBuildId}`);
+            }
+        } catch (error) {
+            if (!silent) {
+                console.warn('No se pudo verificar actualización.', error);
+            }
+        }
+    }
+
+    function setupUpdateChecker() {
+        checkForAppUpdate();
+
+        if (updateCheckTimerId) {
+            clearInterval(updateCheckTimerId);
+        }
+
+        updateCheckTimerId = setInterval(() => {
+            checkForAppUpdate();
+        }, UPDATE_CHECK_INTERVAL_MS);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                checkForAppUpdate();
+            }
+        });
+    }
+
+    function showUpdateBanner(deployedAt = '') {
+        const banner = document.getElementById('updateBanner');
+        const text = document.getElementById('updateBannerText');
+
+        if (!banner || !text) return;
+
+        const suffix = deployedAt ? ` (${deployedAt})` : '';
+        text.textContent = `Hay una nueva versión de AVA disponible${suffix}.`;
+        banner.classList.remove('hidden');
+    }
+
+    function hideUpdateBanner() {
+        const banner = document.getElementById('updateBanner');
+        if (banner) {
+            banner.classList.add('hidden');
+        }
+    }
+
+    function applyAppUpdate() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('build', latestAvailableBuildId || Date.now().toString());
+        window.location.href = url.toString();
     }
 
     // ========================================
