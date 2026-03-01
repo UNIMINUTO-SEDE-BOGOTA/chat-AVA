@@ -370,7 +370,7 @@
         chat.title = CATEGORY_NAMES[category];
 
         const welcomeContentByCategory = {
-            capacitacion: `👋 Bienvenida al módulo "${CATEGORY_NAMES[category]}".\n\nPara comenzar, escribe un mensaje en este chat.\nPor ejemplo: "empecemos" o "iniciar módulo 1".\n\nSi prefieres, también puedes escribir: "quiero un resumen del módulo 1".`,
+            capacitacion: `👋 ¡Hola! Bienvenida a "${CATEGORY_NAMES[category]}".\n\nPara empezar, escribe: "empecemos".`,
             default: `👋 Bienvenida al módulo "${CATEGORY_NAMES[category]}". Estoy lista para ayudarte.`
         };
 
