@@ -21,13 +21,13 @@
             <!-- Chats se agregan dinámicamente -->
         </div>
         <div class="sidebar-decorative">
-            <img src="./assets/images/ava-mascota.png" onerror="this.onerror=null;this.src='./assets/images/ava-mascota.png.png';" alt="AVA" class="sidebar-ava-image" style="width:78px;height:auto;max-width:100%;">
+            <img src="./assets/images/ava-mascota.png" onerror="this.onerror=null;this.src='./assets/images/ava-mascota.png.png';" alt="AVA" class="sidebar-ava-image" style="width:78px;height:auto;max-width:100%;cursor:pointer;" title="Volver a la ventana principal" onclick="goToMainWindow()">
         </div>
     </div>
     <!-- Main Chat -->
 <div class="chat-container">
     <div class="chat-header">
-        <h1 id="chatTitle" class="chat-brand">AVA</h1>
+        <h1 id="chatTitle" class="chat-brand" style="cursor:pointer;" title="Volver a la ventana principal" onclick="goToMainWindow()">AVA</h1>
     </div>
 
     <div class="messages-container" id="messagesContainer">

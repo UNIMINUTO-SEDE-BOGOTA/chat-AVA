@@ -292,6 +292,15 @@ body {
     background: var(--bg-surface);
 }
 
+.process-btn-secondary {
+    background: var(--bg-surface);
+    color: var(--text-main);
+}
+
+.process-btn-secondary:hover {
+    background: var(--bg-main);
+}
+
 .message {
     display: flex;
     gap: 12px;

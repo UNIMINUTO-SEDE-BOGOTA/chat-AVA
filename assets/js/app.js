@@ -10,25 +10,21 @@
     const PROCESOS = {
         'Docencia': [
             'Enseñanza, Aprendizaje y Evaluación',
-            'Vida Estudiantil',
-            'Desarrollo Curricular',
-            'Evaluación Docente',
-            'Planeación Académica'
+            'Vida Estudiantil'
         ],
         'Investigación': [
             'Investigación Formativa',
-            'I+D+I+C',
-            'Publicaciones',
-            'Gestión de Proyectos',
-            'Grupos de Investigación',
-            'Semilleros'
+            'Transferencia de Conocimiento y Tecnología'
         ],
         'Proyección Social': [
-            'Educación Continua',
-            'Gestión de Empleabilidad',
-            'Proyectos Sociales',
-            'Prácticas Profesionales',
-            'Responsabilidad Social'
+            'Educación Continua'
+        ],
+        'Gestión Administrativa y Financiera': [
+            'Gestión de Ingresos',
+            'Aprovisionamiento'
+        ],
+        'Gestión de Mercadeo y Posicionamiento': [
+            'Comercialización y Ventas'
         ]
     };
     const CATEGORY_NAMES = {
@@ -197,6 +193,16 @@
         loadChat(currentChatId);
     }
 
+    function goToMainWindow() {
+        const chat = getCurrentChat();
+        if (chat && chat.messages.length === 0 && chat.state === 'welcome') {
+            loadChat(chat.id);
+            return;
+        }
+
+        createNewChat();
+    }
+
     function ensureActiveChat() {
         if (!currentChatId || !chats.some(chat => chat.id === currentChatId)) {
             createNewChat();
@@ -360,7 +366,7 @@
         // Mensaje de bienvenida del bot
         const welcomeMessage = {
             role: 'assistant',
-            content: `👋 Bienvenido al módulo "${CATEGORY_NAMES[category]}". Estoy listo para ayudarte.`,
+            content: `👋 Bienvenida al módulo "${CATEGORY_NAMES[category]}". Estoy lista para ayudarte.`,
             timestamp: new Date().toISOString()
         };
 
@@ -652,7 +658,7 @@
         selectionDiv.className = 'process-selection';
         selectionDiv.id = 'processSelectionDiv';
         selectionDiv.innerHTML = `
-            <div class="process-selection-title">📋 Selecciona el macroproceso a auditar:</div>
+            <div class="process-selection-title">📋 Selecciona el macroproceso:</div>
             <div class="process-buttons">
                 ${Object.keys(PROCESOS).map(macro => `
                     <button class="process-btn" onclick="selectMacroproceso('${macro}')">
@@ -670,15 +676,15 @@
         const subprocesos = PROCESOS[macro];
 
         selectionDiv.innerHTML = `
-            <div class="process-selection-title">📋 Macroproceso: <strong>${macro}</strong><br>Selecciona tu subproceso específico:</div>
+            <div class="process-selection-title">📋 Macroproceso: <strong>${macro}</strong><br>Selecciona el subproceso:</div>
             <div class="process-buttons">
                 ${subprocesos.map(sub => `
                     <button class="process-btn" onclick="selectProcess('${sub}', '${macro}')">
                         ${sub}
                     </button>
                 `).join('')}
-                <button class="process-btn" onclick="renderProcessSelection()" style="background: var(--bg-secondary); color: var(--text-primary);">
-                    ← Volver
+                <button class="process-btn process-btn-secondary" onclick="renderProcessSelection()">
+                    ← Cambiar macroproceso
                 </button>
             </div>
         `;
