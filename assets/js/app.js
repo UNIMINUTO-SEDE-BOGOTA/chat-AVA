@@ -2,8 +2,8 @@
     // CONFIGURACIÓN
     // ========================================
     const CATEGORY_WEBHOOKS = {
-        capacitacion: 'https://TU_N8N_URL/webhook/CAPACITACION_ID',
-        consulta: 'https://TU_N8N_URL/webhook/CONSULTA_ID',
+        capacitacion: 'https://n8necosystem-amdxgsdnd3dgewaj.centralus-01.azurewebsites.net/webhook/ava-capacitacion',
+        consulta: 'https://n8necosystem-amdxgsdnd3dgewaj.centralus-01.azurewebsites.net/webhook/ava-consulta-iso',
         simulador: 'https://n8necosystem-amdxgsdnd3dgewaj.centralus-01.azurewebsites.net/webhook/4c16333e-fdf5-4c86-b6b2-35bf5f0493f0',
         gestion: 'https://TU_N8N_URL/webhook/GESTION_ID'
     };
