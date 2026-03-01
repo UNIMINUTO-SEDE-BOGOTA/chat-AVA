@@ -33,7 +33,7 @@
         simulador: 'Simulador de Auditorías',
         gestion: 'Gestión de No Conformidades'
     };
-    const REQUEST_TIMEOUT_MS = 15000;
+    const REQUEST_TIMEOUT_MS = 60000;
     const DELETE_UNDO_TIMEOUT_MS = 5000;
     const UPDATE_CHECK_INTERVAL_MS = 120000;
     const VERSION_MANIFEST_URL = './version.json';
@@ -66,6 +66,12 @@
         }
 
         setupUpdateChecker();
+
+        const input = document.getElementById('messageInput');
+        if (input) {
+            input.addEventListener('input', adjustMessageInputHeight);
+            adjustMessageInputHeight();
+        }
     }
 
     async function checkForAppUpdate({ silent = true } = {}) {
@@ -420,7 +426,7 @@
         }
 
         const WEBHOOK_URL = getWebhookForCategory(chat.category);
-        const sessionId = currentChatId;
+        const sessionId = ensureChatSessionId(chat);
 
         if (!WEBHOOK_URL) {
             chat.messages.push({
@@ -447,17 +453,23 @@
 
             console.log('Payload a n8n (selectProcess):', payload);
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
                 body: JSON.stringify(payload)
             });
+
+            clearTimeout(timeoutId);
 
             const data = await response.json();
 
             const botMessage = {
                 role: 'assistant',
-                content: data.respuesta || data.message?.content || 'Error',
+                content: extractAssistantReply(data),
                 timestamp: new Date().toISOString()
             };
             chat.messages.push(botMessage);
@@ -466,7 +478,7 @@
             console.error('Error:', error);
             chat.messages.push({
                 role: 'assistant',
-                content: 'Error al conectar con el servidor',
+                content: buildUserFriendlyError(error),
                 timestamp: new Date().toISOString()
             });
         } finally {
@@ -488,7 +500,7 @@
 
         const chat = ensureActiveChat();
         if (!chat) return;
-        const sessionId = currentChatId;
+        const sessionId = ensureChatSessionId(chat);
 
         const categoryWebhook = getWebhookForCategory(chat.category);
 
@@ -514,6 +526,7 @@
         maybeUpdateChatTitleFromMessage(chat, message);
         
         input.value = '';
+        adjustMessageInputHeight();
         renderMessages(chat);
         saveChatsToStorage();
         renderChatsList();
@@ -583,10 +596,17 @@
     }
 
     function handleKeyPress(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
+        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
             event.preventDefault();
             sendMessage();
         }
+    }
+
+    function adjustMessageInputHeight() {
+        const input = document.getElementById('messageInput');
+        if (!input) return;
+        input.style.height = 'auto';
+        input.style.height = `${input.scrollHeight}px`;
     }
 
     // ========================================
@@ -660,8 +680,8 @@
         selectionDiv.innerHTML = `
             <div class="process-selection-title">📋 Selecciona el macroproceso:</div>
             <div class="process-buttons">
-                ${Object.keys(PROCESOS).map(macro => `
-                    <button class="process-btn" onclick="selectMacroproceso('${macro}')">
+                ${Object.keys(PROCESOS).map((macro, i) => `
+                    <button class="process-btn" onclick="selectMacroprocesoPorIndex(${i})">
                         ${macro}
                     </button>
                 `).join('')}
@@ -678,8 +698,8 @@
         selectionDiv.innerHTML = `
             <div class="process-selection-title">📋 Macroproceso: <strong>${macro}</strong><br>Selecciona el subproceso:</div>
             <div class="process-buttons">
-                ${subprocesos.map(sub => `
-                    <button class="process-btn" onclick="selectProcess('${sub}', '${macro}')">
+                ${subprocesos.map((sub, i) => `
+                    <button class="process-btn" onclick="selectProcessSafe(${i}, ${Object.keys(PROCESOS).indexOf(macro)})">
                         ${sub}
                     </button>
                 `).join('')}
@@ -688,6 +708,20 @@
                 </button>
             </div>
         `;
+    }
+
+    function selectProcessSafe(subIndex, macroIndex) {
+        const macro = Object.keys(PROCESOS)[macroIndex];
+        if (!macro) return;
+        const subprocesos = PROCESOS[macro];
+        if (!subprocesos || subIndex >= subprocesos.length) return;
+        selectProcess(subprocesos[subIndex], macro);
+    }
+
+    function selectMacroprocesoPorIndex(index) {
+        const macro = Object.keys(PROCESOS)[index];
+        if (!macro) return;
+        selectMacroproceso(macro);
     }
 
     function renderChatsList() {
@@ -820,6 +854,8 @@
         });
 
         let formatted = escapeHtml(textWithoutCodeBlocks)
+            .replace(/^### (.+)$/gm, '<h3 class="msg-h3">$1</h3>')
+            .replace(/^## (.+)$/gm, '<h2 class="msg-h2">$1</h2>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
             .replace(/(https?:\/\/[^\s<]+)/g, (url) => {
@@ -893,7 +929,10 @@
 
     function buildUserFriendlyError(error) {
         if (error?.name === 'AbortError') {
-            return 'La solicitud tardó demasiado y se canceló. Intenta de nuevo.';
+            return 'AVA está procesando una consulta compleja. Por favor intenta de nuevo en unos segundos.';
+        }
+        if (error?.message?.includes('HTTP 5')) {
+            return 'El servidor tuvo un problema temporal. Por favor intenta de nuevo.';
         }
         return 'Lo siento, hubo un error al procesar tu mensaje. Por favor intenta de nuevo.';
     }
@@ -919,7 +958,10 @@
                     ...chat,
                     id: chat?.id || generateChatId(),
                     sessionId: chat?.sessionId || generateSessionId(),
-                    title: !chat?.title || chat.title === 'Nuevo chat' ? 'AVA' : chat.title
+                    title: !chat?.title || chat.title === 'Nuevo chat' ? 'AVA' : chat.title,
+                    macroproceso: chat?.macroproceso || null,
+                    process: chat?.process || null,
+                    state: chat?.state || 'welcome'
                 }))
                 : [];
         } catch (error) {

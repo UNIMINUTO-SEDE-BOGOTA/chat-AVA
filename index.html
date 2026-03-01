@@ -59,14 +59,14 @@
 
     <div class="input-container" id="inputContainer">
         <div class="input-wrapper disabled" id="inputWrapper">
-            <input 
-                type="text" 
-                class="message-input" 
+            <textarea
+                class="message-input"
                 id="messageInput"
-                placeholder="Escribe tu mensaje..."
-                onkeypress="handleKeyPress(event)"
+                placeholder="Escribe tu mensaje... (Ctrl+Enter para enviar)"
+                onkeydown="handleKeyPress(event)"
+                rows="1"
                 disabled
-            >
+            ></textarea>
             <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
                 ➤
             </button>
