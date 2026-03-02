@@ -371,6 +371,7 @@
 
         const welcomeContentByCategory = {
             capacitacion: `👋 ¡Hola! Bienvenida a "${CATEGORY_NAMES[category]}".\n\nPara empezar, escribe: "empecemos".`,
+            consulta: `👋 ¡Hola! Aquí puedes resolver dudas sobre ISO 9001:2015.\n\nPara empezar, escribe tu consulta. Ejemplo: "¿Qué es una no conformidad?".`,
             default: `👋 Bienvenida al módulo "${CATEGORY_NAMES[category]}". Estoy lista para ayudarte.`
         };
 
