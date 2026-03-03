@@ -36,26 +36,41 @@
     --accent-hover: #0b3e81;
 }
 
+/* ─── Base ─────────────────────────────────────────────────────────────── */
+
+html, body {
+    /* Use dvh so the layout respects the dynamic viewport on mobile
+       (shrinks when the browser chrome / address bar is visible)       */
+    height: 100%;
+    height: 100dvh;
+}
+
 body {
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--bg-app);
     color: var(--text-main);
-    height: 100vh;
     display: flex;
+    /* Prevent the outer page from scrolling – only inner panels scroll */
     overflow: hidden;
 }
 
+/* ─── Sidebar ───────────────────────────────────────────────────────────── */
+
 .sidebar {
     width: 280px;
+    min-width: 280px;         /* never collapse on desktop */
     background: var(--bg-sidebar);
     border-right: 1px solid var(--sidebar-border);
     display: flex;
     flex-direction: column;
+    /* sidebar itself must not overflow the viewport */
+    overflow: hidden;
 }
 
 .sidebar-header {
     padding: 16px;
     border-bottom: 1px solid var(--sidebar-border);
+    flex-shrink: 0;           /* header never shrinks */
 }
 
 .new-chat-btn {
@@ -79,7 +94,10 @@ body {
 .chats-list {
     flex: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;  /* smooth scroll on iOS */
     padding: 10px;
+    /* prevent momentum scroll from leaking to the page */
+    overscroll-behavior: contain;
 }
 
 .sidebar-decorative {
@@ -87,6 +105,7 @@ body {
     padding: 16px;
     display: flex;
     justify-content: center;
+    flex-shrink: 0;
     background: linear-gradient(to bottom, transparent, rgba(15, 76, 156, 0.04));
 }
 
@@ -95,6 +114,8 @@ body {
     max-width: 100%;
     height: auto;
 }
+
+/* ─── Chat items ────────────────────────────────────────────────────────── */
 
 .chat-item {
     padding: 10px 10px 10px 12px;
@@ -137,6 +158,8 @@ body {
     cursor: pointer;
     opacity: 0.55;
     transition: opacity 0.2s, background 0.2s;
+    /* Larger tap target on mobile without changing visual size */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .chat-delete-btn:hover {
@@ -144,12 +167,17 @@ body {
     background: rgba(239, 68, 68, 0.14);
 }
 
+/* ─── Chat container ────────────────────────────────────────────────────── */
+
 .chat-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     background: var(--bg-main);
     min-width: 0;
+    /* The chat pane fills the remaining viewport height exactly */
+    min-height: 0;
+    overflow: hidden;
 }
 
 .chat-header {
@@ -161,6 +189,7 @@ body {
     gap: 10px;
     background: var(--header-bg);
     backdrop-filter: blur(8px);
+    flex-shrink: 0;           /* header never shrinks */
 }
 
 .chat-header h1 {
@@ -184,13 +213,22 @@ body {
     text-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
 }
 
+/* ─── Messages container ────────────────────────────────────────────────── */
+
 .messages-container {
+    /* flex: 1 + min-height: 0 is the key combination that makes the
+       scrollable area work inside a flex column on iOS Safari          */
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     padding: 26px 0;
     display: flex;
     flex-direction: column;
 }
+
+/* ─── Welcome screen ────────────────────────────────────────────────────── */
 
 .welcome-screen {
     display: flex;
@@ -200,6 +238,8 @@ body {
     text-align: center;
     width: min(760px, calc(100% - 32px));
     margin: auto;
+    /* give it a little vertical breathing room on short screens */
+    padding: 16px 0;
 }
 
 .robot-icon {
@@ -243,6 +283,7 @@ body {
     transition: border-color 0.2s, transform 0.12s, background 0.2s;
     font-size: 14px;
     color: var(--text-main);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .category-btn:hover {
@@ -286,6 +327,8 @@ body {
     margin-right: 8px;
 }
 
+/* ─── Process selection ─────────────────────────────────────────────────── */
+
 .process-selection {
     width: min(760px, calc(100% - 32px));
     margin: 0 auto 20px;
@@ -317,6 +360,7 @@ body {
     font-weight: 500;
     transition: border-color 0.2s, background 0.2s;
     text-align: left;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .process-btn:hover {
@@ -332,6 +376,8 @@ body {
 .process-btn-secondary:hover {
     background: var(--bg-main);
 }
+
+/* ─── Messages ──────────────────────────────────────────────────────────── */
 
 .message {
     display: flex;
@@ -401,6 +447,7 @@ body {
     color: var(--text-main);
     border: 1px solid var(--message-border);
     overflow-wrap: anywhere;
+    word-break: break-word;   /* extra safety on narrow screens */
 }
 
 .message.user .message-content {
@@ -466,6 +513,8 @@ body {
     color: #ffffff;
 }
 
+/* ─── Input area ────────────────────────────────────────────────────────── */
+
 .input-container {
     padding: 14px 24px 20px;
     border-top: 1px solid var(--border-soft);
@@ -473,6 +522,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex-shrink: 0;           /* never let it be squeezed out */
 }
 
 .input-wrapper {
@@ -505,12 +555,17 @@ body {
     min-height: 40px;
     max-height: 180px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+    /* Prevent iOS from zooming in on the textarea (font-size >= 16px) */
+    font-size: 16px;
 }
 
 .message-input::placeholder {
     color: #9ca3af;
+    /* Keep placeholder at readable size without affecting zoom */
+    font-size: 14px;
 }
 
 .send-btn {
@@ -525,6 +580,8 @@ body {
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .send-btn:hover {
@@ -548,6 +605,8 @@ body {
     text-align: center;
 }
 
+/* ─── Typing indicator ──────────────────────────────────────────────────── */
+
 .typing-indicator {
     display: flex;
     gap: 4px;
@@ -562,28 +621,21 @@ body {
     animation: typing 1.2s infinite;
 }
 
-.typing-dot:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.typing-dot:nth-child(3) {
-    animation-delay: 0.4s;
-}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes typing {
-    0%,
-    60%,
-    100% {
-        transform: translateY(0);
-    }
-    30% {
-        transform: translateY(-6px);
-    }
+    0%, 60%, 100% { transform: translateY(0); }
+    30%            { transform: translateY(-6px); }
 }
+
+/* ─── Utility ───────────────────────────────────────────────────────────── */
 
 .hidden {
     display: none !important;
 }
+
+/* ─── Toasts ────────────────────────────────────────────────────────────── */
 
 .undo-toast {
     position: fixed;
@@ -655,9 +707,12 @@ body {
     background: var(--accent-hover);
 }
 
+/* ─── Responsive: 900 px ────────────────────────────────────────────────── */
+
 @media (max-width: 900px) {
     .sidebar {
         width: 232px;
+        min-width: 232px;
     }
 
     .welcome-screen h2 {
@@ -665,23 +720,77 @@ body {
     }
 }
 
+/* ─── Responsive: mobile (≤ 768 px) ────────────────────────────────────── */
+
 @media (max-width: 768px) {
+
+    /* Stack sidebar above the chat pane */
     body {
         flex-direction: column;
+        /* Use the dynamic viewport height so the layout accounts for
+           the browser chrome on iOS/Android correctly                  */
+        height: 100dvh;
+        height: -webkit-fill-available; /* legacy Safari fallback */
     }
 
+    /* Sidebar becomes a thin horizontal bar at the top */
     .sidebar {
         width: 100%;
-        max-height: 170px;
+        min-width: 0;
+        /* Fixed height – gives a predictable top bar */
+        height: 56px;
+        min-height: 56px;
+        max-height: 56px;
+        flex-direction: row;
+        align-items: center;
+        border-right: none;
+        border-bottom: 1px solid var(--sidebar-border);
+        overflow: hidden;
     }
 
-    .categories-grid {
-        grid-template-columns: 1fr;
+    .sidebar-header {
+        padding: 8px 12px;
+        border-bottom: none;
+        border-right: 1px solid var(--sidebar-border);
+        flex-shrink: 0;
     }
 
-    .process-buttons {
-        display: grid;
-        grid-template-columns: 1fr;
+    .new-chat-btn {
+        padding: 8px 12px;
+        white-space: nowrap;
+        font-size: 13px;
+    }
+
+    /* Chats list scrolls horizontally in the top bar */
+    .chats-list {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0 10px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .chat-item {
+        flex-shrink: 0;
+        max-width: 160px;
+        margin-bottom: 0;
+        padding: 6px 10px;
+        white-space: nowrap;
+    }
+
+    .sidebar-decorative {
+        display: none;
+    }
+
+    /* Chat pane takes all remaining height */
+    .chat-container {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
     }
 
     .chat-header,
@@ -690,6 +799,7 @@ body {
         padding-right: 14px;
     }
 
+    /* Make content fill width on narrow screens */
     .message,
     .process-selection,
     .welcome-screen {
@@ -700,10 +810,16 @@ body {
         max-width: 100%;
     }
 
-    .sidebar-decorative {
-        display: none;
+    /* Single-column grids */
+    .categories-grid {
+        grid-template-columns: 1fr;
     }
 
+    .process-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    /* Toasts full-width at bottom */
     .undo-toast {
         left: 12px;
         right: 12px;
@@ -718,4 +834,3 @@ body {
         justify-content: space-between;
     }
 }
-

@@ -71,6 +71,29 @@
         if (input) {
             input.addEventListener('input', adjustMessageInputHeight);
             adjustMessageInputHeight();
+
+            // ── FIX: iOS virtual keyboard pushes the viewport up, which
+            // can leave the input hidden behind the keyboard.  When the
+            // textarea receives focus we scroll the input-container into
+            // view after a short delay (enough time for the keyboard to
+            // finish animating).
+            input.addEventListener('focus', () => {
+                setTimeout(() => {
+                    const inputContainer = document.getElementById('inputContainer');
+                    if (inputContainer) {
+                        inputContainer.scrollIntoView({ block: 'end', behavior: 'smooth' });
+                    }
+                }, 350);
+            });
+        }
+
+        // ── FIX: On mobile, when the virtual keyboard closes the
+        // viewport returns to its original size.  We re-scroll to the
+        // bottom of the messages so content isn't hidden.
+        if (typeof window.visualViewport !== 'undefined') {
+            window.visualViewport.addEventListener('resize', () => {
+                scrollToBottom();
+            });
         }
     }
 
@@ -602,7 +625,7 @@
     }
 
     function handleKeyPress(event) {
-        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+        if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             sendMessage();
         }
@@ -611,8 +634,12 @@
     function adjustMessageInputHeight() {
         const input = document.getElementById('messageInput');
         if (!input) return;
+        // ── FIX: resetting to 'auto' then reading scrollHeight is the
+        // correct pattern, but on iOS it can cause a brief layout flash.
+        // Clamping to max-height prevents runaway growth.
         input.style.height = 'auto';
-        input.style.height = `${input.scrollHeight}px`;
+        const maxH = 180;
+        input.style.height = `${Math.min(input.scrollHeight, maxH)}px`;
     }
 
     // ========================================
@@ -809,9 +836,15 @@
         }
     }
 
+    // ── FIX: robust cross-browser scroll-to-bottom.
+    // requestAnimationFrame ensures the DOM has painted before we measure
+    // scrollHeight, which fixes the "stuck at top" bug on iOS Safari.
     function scrollToBottom() {
-        const container = document.getElementById('messagesContainer');
-        container.scrollTop = container.scrollHeight;
+        requestAnimationFrame(() => {
+            const container = document.getElementById('messagesContainer');
+            if (!container) return;
+            container.scrollTop = container.scrollHeight;
+        });
     }
 
     function maybeUpdateChatTitleFromMessage(chat, userText) {
@@ -980,4 +1013,3 @@
     // INICIO
     // ========================================
     init();
-

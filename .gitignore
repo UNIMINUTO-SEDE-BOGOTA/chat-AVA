@@ -1,12 +1,4 @@
-# OS
-.DS_Store
-Thumbs.db
-
-# Editors
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-
-# Logs
-*.log
-
+.env
+node_modules/
+dist/
+coverage/

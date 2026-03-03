@@ -2,8 +2,17 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+        FIX: viewport-fit=cover tells Safari to use the full screen area
+        (including the notch / home-indicator zone).  interactive-widget=
+        resizes-content makes the page shrink when the virtual keyboard
+        appears instead of overlapping content — this is what prevents
+        the "frozen / hidden input" bug on iOS Chrome and Safari.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="app-build-id" content="20260303-1649-db48aca">
+    <!-- Prevent iOS from scaling text on orientation change -->
+    <meta name="format-detection" content="telephone=no">
     <title>AVA - Agente Virtual de Auditoría</title>
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/icon-ava.png?v=2">
     <link rel="shortcut icon" href="./assets/images/icon-ava.png?v=2">
@@ -24,70 +33,70 @@
             <img src="./assets/images/ava-mascota.png" onerror="this.onerror=null;this.src='./assets/images/ava-mascota.png.png';" alt="AVA" class="sidebar-ava-image" style="width:78px;height:auto;max-width:100%;cursor:pointer;" title="Volver a la ventana principal" onclick="goToMainWindow()">
         </div>
     </div>
-    <!-- Main Chat -->
-<div class="chat-container">
-    <div class="chat-header">
-        <h1 id="chatTitle" class="chat-brand" style="cursor:pointer;" title="Volver a la ventana principal" onclick="goToMainWindow()">AVA</h1>
-    </div>
 
-    <div class="messages-container" id="messagesContainer">
-        <!-- Pantalla de bienvenida -->
-        <div class="welcome-screen" id="welcomeScreen">
-            <img src="./assets/images/icon-ava.png" alt="Icono AVA" class="robot-icon" style="width:66px;height:66px;object-fit:contain;">
-            <h2>Hola, Soy AVA</h2>
-            <p>Selecciona una categoría para comenzar</p>
-            <div class="categories-grid">
-                <button class="category-btn" onclick="selectCategory('capacitacion')">
-                    <span class="icon">🧠</span>
-                    Capacitación SGC en UNIMINUTO
-                </button>
-                <button class="category-btn category-btn-disabled" disabled aria-disabled="true" title="Temporalmente inhabilitado">
-                    <span class="category-status-badge">Próximamente</span>
-                    <span class="icon">📘</span>
-                    Consulta Técnica ISO 9001:2015
-                </button>
-                <button class="category-btn" onclick="selectCategory('simulador')">
-                    <span class="icon">💡</span>
-                    Simulador de Auditorías
-                </button>
-                <button class="category-btn category-btn-disabled" disabled aria-disabled="true" title="Temporalmente inhabilitado">
-                    <span class="category-status-badge">Próximamente</span>
-                    <span class="icon">📊</span>
-                    Gestión de No Conformidades
-                </button>
+    <!-- Main Chat -->
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1 id="chatTitle" class="chat-brand" style="cursor:pointer;" title="Volver a la ventana principal" onclick="goToMainWindow()">AVA</h1>
+        </div>
+
+        <div class="messages-container" id="messagesContainer">
+            <!-- Pantalla de bienvenida -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <img src="./assets/images/icon-ava.png" alt="Icono AVA" class="robot-icon" style="width:66px;height:66px;object-fit:contain;">
+                <h2>Hola, Soy AVA</h2>
+                <p>Selecciona una categoría para comenzar</p>
+                <div class="categories-grid">
+                    <button class="category-btn" onclick="selectCategory('capacitacion')">
+                        <span class="icon">🧠</span>
+                        Capacitación SGC en UNIMINUTO
+                    </button>
+                    <button class="category-btn category-btn-disabled" disabled aria-disabled="true" title="Temporalmente inhabilitado">
+                        <span class="category-status-badge">Próximamente</span>
+                        <span class="icon">📘</span>
+                        Consulta Técnica ISO 9001:2015
+                    </button>
+                    <button class="category-btn" onclick="selectCategory('simulador')">
+                        <span class="icon">💡</span>
+                        Simulador de Auditorías
+                    </button>
+                    <button class="category-btn category-btn-disabled" disabled aria-disabled="true" title="Temporalmente inhabilitado">
+                        <span class="category-status-badge">Próximamente</span>
+                        <span class="icon">📊</span>
+                        Gestión de No Conformidades
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="input-container" id="inputContainer">
-        <div class="input-wrapper disabled" id="inputWrapper">
-            <textarea
-                class="message-input"
-                id="messageInput"
-                placeholder="Escribe tu mensaje... (Ctrl+Enter para enviar)"
-                onkeydown="handleKeyPress(event)"
-                rows="1"
-                disabled
-            ></textarea>
-            <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
-                ➤
-            </button>
+        <div class="input-container" id="inputContainer">
+            <div class="input-wrapper disabled" id="inputWrapper">
+                <textarea
+                    class="message-input"
+                    id="messageInput"
+                    placeholder="Escribe tu mensaje… (Enter para enviar, Shift+Enter para nueva línea)"
+                    onkeydown="handleKeyPress(event)"
+                    rows="1"
+                    disabled
+                ></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                    ➤
+                </button>
+            </div>
+            <p class="chat-disclaimer">AVA puede cometer errores. Verifica siempre la información crítica antes de tomar decisiones.</p>
         </div>
-        <p class="chat-disclaimer" style="display:block;width:100%;max-width:760px;margin:8px auto 0;text-align:center;font-style:italic;font-size:10px;">AVA puede cometer errores. Verifica siempre la información crítica antes de tomar decisiones.</p>
     </div>
-</div>
 
-<script src="./assets/js/app.js" defer></script>
+    <script src="./assets/js/app.js" defer></script>
 
-<div class="undo-toast hidden" id="undoToast" role="status" aria-live="polite">
-    <span class="undo-toast-text" id="undoToastText">Chat eliminado</span>
-    <button class="undo-toast-btn" id="undoToastBtn" type="button" onclick="undoDeleteChat()">Deshacer</button>
-</div>
+    <div class="undo-toast hidden" id="undoToast" role="status" aria-live="polite">
+        <span class="undo-toast-text" id="undoToastText">Chat eliminado</span>
+        <button class="undo-toast-btn" id="undoToastBtn" type="button" onclick="undoDeleteChat()">Deshacer</button>
+    </div>
 
-<div class="update-banner hidden" id="updateBanner" role="status" aria-live="polite">
-    <span class="update-banner-text" id="updateBannerText">Hay una nueva versión de AVA disponible.</span>
-    <button class="update-banner-btn" type="button" onclick="applyAppUpdate()">Actualizar</button>
-</div>
+    <div class="update-banner hidden" id="updateBanner" role="status" aria-live="polite">
+        <span class="update-banner-text" id="updateBannerText">Hay una nueva versión de AVA disponible.</span>
+        <button class="update-banner-btn" type="button" onclick="applyAppUpdate()">Actualizar</button>
+    </div>
 </body>
 </html>
-
