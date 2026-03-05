@@ -1,0 +1,9 @@
+/* ============================================================
+   styles/main.css
+   Punto de entrada de estilos. Importa todos los módulos.
+   ============================================================ */
+
+@import './base.css';
+@import './layout.css';
+@import './messages.css';
+@import './components.css';
