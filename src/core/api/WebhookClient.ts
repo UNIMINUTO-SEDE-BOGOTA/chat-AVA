@@ -43,24 +43,39 @@ export async function postToWebhook(
   url: string,
   payload: WebhookPayload
 ): Promise<string> {
-  if (!isValidWebhookUrl(url)) {
-    return '⚠️ Este servicio no tiene webhook configurado. Actualiza config/services.ts.';
-  }
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
+  // Adaptar payload al formato que espera la Edge Function
+  const edgePayload = {
+    mensaje: payload.message,
+    modo: payload.category ?? '',
+    proceso: payload.proceso ?? '',
+    macroproceso: payload.macroproceso ?? '',
+    subproceso: payload.subproceso ?? '',
+    sessionId: payload.sessionId,
+    esSeleccionProceso: payload.esSeleccionProceso ?? false,
+  };
+
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
+
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${anonKey}`,
+      },
       signal: controller.signal,
-      body: JSON.stringify(payload),
+      body: JSON.stringify(edgePayload),
     });
 
     clearTimeout(timeoutId);
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Respuesta no OK:', response.status, errorText);
       throw new Error(`HTTP ${response.status}`);
     }
 
@@ -68,6 +83,7 @@ export async function postToWebhook(
     return extractReply(data);
   } catch (error) {
     clearTimeout(timeoutId);
+    console.error('💥 Error en fetch:', (error as Error).name, (error as Error).message);
     return buildErrorMessage(error);
   }
 }

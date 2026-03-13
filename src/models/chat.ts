@@ -17,7 +17,7 @@ export interface Chat {
   sessionId: string;
   title: string;
   messages: ChatMessage[];
-  /** Id del servicio al que pertenece este chat (ej: 'ava') */
+  /** Id del servicio al que pertenece este chat */
   serviceId: string | null;
   /** Categoría interna del servicio (ej: 'capacitacion', 'simulador') */
   category: string | null;
