@@ -1,18 +1,15 @@
 {
-  "name": "ecosistema-360",
-  "version": "1.0.0",
-  "description": "Asistente virtual inteligente con chat integrado.",
-  "main": "index.js",
+  "name": "chat-integrado",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
+    "typescript": "~5.9.3",
     "vite": "^7.3.1"
   }
 }

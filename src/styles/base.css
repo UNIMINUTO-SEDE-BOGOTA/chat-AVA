@@ -1,0 +1,66 @@
+/* ============================================================
+   styles/base.css
+   Variables globales, reset y tipografía base.
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-app: #f4f7fb;
+  --bg-main: #ffffff;
+  --bg-sidebar: #f8fafc;
+  --bg-sidebar-elevated: #ffffff;
+  --bg-surface: #f8fafc;
+  --bg-assistant: #f9fafb;
+  --bg-user: #0f4c9c;
+
+  --text-main: #0f172a;
+  --text-primary: var(--text-main);
+  --text-muted: #64748b;
+  --text-on-dark: #0f172a;
+  --text-sidebar: #1e293b;
+  --text-sidebar-active: #0f172a;
+
+  --border-soft: #e2e8f0;
+  --sidebar-border: #e2e8f0;
+  --sidebar-btn-border: #d9e2ec;
+  --sidebar-btn-hover: #eef4fb;
+  --sidebar-btn-hover-border: #d1d5db;
+  --chat-item-hover: #eef4fb;
+  --chat-item-active: #e4ecf7;
+
+  --header-bg: rgba(255, 255, 255, 0.92);
+  --avatar-assistant: #e5e7eb;
+  --avatar-user: #dbeafe;
+  --message-border: #eceff3;
+  --input-border: #d9e2ec;
+  --disabled-btn: #cbd5e1;
+  --typing-dot: #9ca3af;
+
+  --accent: #0f4c9c;
+  --accent-hover: #0b3e81;
+}
+
+html,
+body {
+  height: 100%;
+  height: 100dvh;
+}
+
+body {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-app);
+  color: var(--text-main);
+  display: flex;
+  overflow: hidden;
+}
+
+.hidden {
+  display: none !important;
+}

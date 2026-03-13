@@ -1,0 +1,210 @@
+/* ============================================================
+   styles/components.css
+   Chat items, input, botones y toasts.
+   ============================================================ */
+
+/* ── Chat items ──────────────────────────────────────────── */
+
+.chat-item {
+  padding: 10px 10px 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-sidebar);
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chat-item:hover  { background: var(--chat-item-hover); }
+.chat-item.active {
+  background: var(--chat-item-active);
+  color: var(--text-sidebar-active);
+  font-weight: 500;
+}
+
+.chat-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.chat-delete-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.2s, background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.chat-delete-btn:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.14);
+}
+
+/* ── Input wrapper ───────────────────────────────────────── */
+
+.input-wrapper {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  background: var(--bg-surface);
+  border: 1px solid var(--input-border);
+  border-radius: 14px;
+  padding: 8px 8px 8px 14px;
+}
+
+.input-wrapper.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.message-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  line-height: 1.5;
+  padding: 8px 0;
+  color: var(--text-main);
+  resize: none;
+  min-height: 40px;
+  max-height: 180px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  /* ≥16px prevents iOS auto-zoom */
+  font-size: 16px;
+}
+
+.message-input::placeholder {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent);
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.send-btn:hover    { background: var(--accent-hover); }
+.send-btn:disabled { background: var(--disabled-btn); cursor: not-allowed; }
+
+.chat-disclaimer {
+  width: 100%;
+  max-width: 760px;
+  margin: 8px auto 0;
+  display: block;
+  font-size: 10px;
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── Undo toast ──────────────────────────────────────────── */
+
+.undo-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-main);
+  color: var(--text-main);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+}
+
+.undo-toast-text { font-size: 13px; }
+
+.undo-toast-btn {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.undo-toast-btn:hover { background: var(--accent-hover); }
+
+/* ── Update banner ───────────────────────────────────────── */
+
+.update-banner {
+  position: fixed;
+  right: 20px;
+  bottom: 70px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-main);
+  color: var(--text-main);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  z-index: 998;
+}
+
+.update-banner-text { font-size: 13px; }
+
+.update-banner-btn {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.update-banner-btn:hover { background: var(--accent-hover); }
+
+/* ── Mobile toasts full-width ────────────────────────────── */
+
+@media (max-width: 768px) {
+  .undo-toast {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    justify-content: space-between;
+  }
+
+  .update-banner {
+    left: 12px;
+    right: 12px;
+    bottom: 62px;
+    justify-content: space-between;
+  }
+}
