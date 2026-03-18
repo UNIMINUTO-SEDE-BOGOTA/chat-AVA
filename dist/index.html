@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="app-build-id" content="20260318-2012-44e3a32">
+  <meta name="format-detection" content="telephone=no">
+  <title>AVA - Agente Virtual de Auditoría</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/icon-ava.png?v=2">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; height: 100dvh; overflow: hidden; }
+    body { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f7fb; color: #0f172a; display: flex; }
+    .sidebar { width: 280px; min-width: 280px; background: #f8fafc; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-container { flex: 1; display: flex; flex-direction: column; background: #ffffff; min-width: 0; min-height: 0; overflow: hidden; }
+    .messages-container { flex: 1; min-height: 0; overflow-y: auto; }
+    .hidden { display: none !important; }
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; min-width: 0; height: 56px; min-height: 56px; max-height: 56px; flex-direction: row; align-items: center; border-right: none; border-bottom: 1px solid #e2e8f0; }
+    }
+  </style>
+  <script type="module" crossorigin src="/assets/index-DXxwdLZb.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CaaOw3kV.css">
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <button class="new-chat-btn" id="newChatBtn" data-tour="new-chat">➕ Nuevo Chat</button>
+    </div>
+    <div class="chats-list" id="chatsList" data-tour="chats-list"></div>
+
+    <!-- Botones Teams + Forms juntos -->
+    <div class="sidebar-action-btns">
+
+      <div data-tour="teams-btn">
+        <a href="https://teams.microsoft.com/l/chat/0/0?users=karol.munoz.l@uniminuto.edu"
+          target="_blank" rel="noopener noreferrer"
+          class="teams-btn" id="teamsBtn" title="Abrir chat en Microsoft Teams">
+          <svg class="teams-icon" viewBox="0 0 2228.833 2073.333" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1554.637 777.5h575.713c54.391 0 98.483 44.092 98.483 98.483v524.398c0 199.901-162.051 361.952-361.952 361.952h-1.711c-199.901.028-361.975-162.023-361.975-361.924V828.971c0-28.427 23.044-51.471 51.442-51.471z" fill="#5059C9"/>
+            <circle cx="1943.75" cy="440.583" r="233.25" fill="#5059C9"/>
+            <circle cx="1218.083" cy="336.917" r="336.917" fill="#7B83EB"/>
+            <path d="M1667.323 777.5H717.01c-53.743 1.33-96.257 45.931-94.927 99.676v598.105c-7.825 322.069 247.353 590.414 569.427 598.238 322.074-7.824 577.252-276.169 569.427-598.238V877.176c1.33-53.745-41.184-98.346-94.927-99.676h.313z" fill="#7B83EB"/>
+            <path opacity=".1" d="M1243 777.5v838.145c-.258 38.435-23.549 72.964-59.09 87.598a91.856 91.856 0 0 1-35.765 7.257H667.613c-6.738-21.738-11.98-43.976-15.536-66.472a599.811 599.811 0 0 1-4.938-75.927V877.15c-1.33-53.715 41.17-98.308 94.862-99.65H1243z" fill="#000"/>
+            <path opacity=".2" d="M1193 777.5v893.145c-.19 12.484-2.608 24.829-7.117 36.43-14.632 35.554-49.168 58.849-87.612 59.07H691.975c-8.463-21.674-16.1-43.976-22.337-66.472-6.277-22.01-10.505-44.5-12.625-67.236a599.811 599.811 0 0 1-4.938-75.927V877.15c-1.33-53.715 41.17-98.308 94.862-99.65H1193z" fill="#000"/>
+            <path opacity=".2" d="M1193 777.5v783.145c-.341 52.975-43.467 95.659-96.443 95.355H646.462C640.688 1634.5 638 1612 638 1589.145V877.15c-1.33-53.715 41.17-98.308 94.862-99.65H1193z" fill="#000"/>
+            <path opacity=".2" d="M1143 777.5v783.145c-.341 52.975-43.467 95.659-96.443 95.355H646.462C640.688 1634.5 638 1612 638 1589.145V877.15c-1.33-53.715 41.17-98.308 94.862-99.65H1143z" fill="#000"/>
+            <path d="M244.463 777.5h898.074c53.021 0 96.463 43.442 96.463 96.463v898.074c0 53.021-43.442 96.463-96.463 96.463H244.463C191.442 1868.5 148 1825.058 148 1772.037V873.963c0-53.021 43.442-96.463 96.463-96.463z" fill="#4B53BC"/>
+            <path d="M803.051 1024.591H630.268v517.042H509.914v-517.042H338.386V912.087h464.665v112.504z" fill="#fff"/>
+          </svg>
+          <span>Contáctanos</span>
+        </a>
+      </div>
+
+      <div data-tour="feedback-btn">
+        <a href="https://forms.office.com/r/sDgijENHcP?origin=lprLink"
+          target="_blank" rel="noopener noreferrer"
+          class="feedback-btn" id="feedbackBtn" title="Califica tu experiencia con AVA">
+          <svg class="feedback-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Califica tu experiencia</span>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="sidebar-decorative">
+      <img src="/assets/images/ava-mascota.png" alt="AVA" class="sidebar-ava-image" id="sidebarAvatar" title="Volver a la ventana principal">
+    </div>
+  </div>
+
+  <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" title="Ver chats" aria-label="Abrir menú de chats">☰</button>
+      <h1 id="logoBtn" class="chat-brand" style="cursor:pointer;" title="Volver a la ventana principal">AVA</h1>
+      <div class="header-actions">
+        <button class="theme-toggle-btn" id="themeToggleBtn" data-tour="theme-btn" title="Cambiar tema">
+          <span id="themeIcon">🌙</span>
+        </button>
+        <button class="tour-replay-btn" id="tourReplayBtn" title="Ver tour guiado">?</button>
+      </div>
+    </div>
+
+    <div class="messages-container" id="messagesContainer">
+      <div class="welcome-screen" id="welcomeScreen">
+        <img src="/assets/images/icon-ava.png" alt="Icono AVA" class="robot-icon">
+        <h2>Hola, Soy AVA</h2>
+        <p>Selecciona una categoría para comenzar</p>
+        <div class="categories-grid" id="categoriesGrid" data-tour="categories"></div>
+      </div>
+    </div>
+
+    <div class="input-container hidden" id="inputContainer">
+      <div class="input-wrapper disabled" id="inputWrapper" data-tour="input">
+        <textarea class="message-input" id="messageInput"
+          placeholder="Escribe tu mensaje…"
+          rows="1" disabled></textarea>
+        <button class="send-btn" id="sendBtn" disabled>➤</button>
+      </div>
+      <p class="chat-disclaimer">AVA puede cometer errores. Verifica siempre la información crítica antes de tomar decisiones.</p>
+    </div>
+  </div>
+
+  <!-- Tour overlay -->
+  <div class="tour-backdrop hidden" id="tourBackdrop"></div>
+  <div class="tour-tooltip hidden" id="tourTooltip" role="dialog" aria-live="polite">
+    <div class="tour-tooltip-header">
+      <span class="tour-step-label" id="tourStepLabel">1 / 6</span>
+      <button class="tour-close-btn" id="tourCloseBtn" aria-label="Cerrar tour">✕</button>
+    </div>
+    <div class="tour-tooltip-body">
+      <img class="tour-avatar" id="tourAvatar" src="/assets/images/ava_frente.png" alt="AVA">
+      <div class="tour-tooltip-content">
+        <p class="tour-tooltip-title" id="tourTooltipTitle"></p>
+        <p class="tour-tooltip-text" id="tourTooltipText"></p>
+      </div>
+    </div>
+    <div class="tour-tooltip-actions">
+      <button class="tour-btn tour-btn-secondary" id="tourPrevBtn">← Anterior</button>
+      <button class="tour-btn tour-btn-primary" id="tourNextBtn">Siguiente →</button>
+    </div>
+  </div>
+
+  <div class="undo-toast hidden" id="undoToast" role="status" aria-live="polite">
+    <span class="undo-toast-text" id="undoToastText">Chat eliminado</span>
+    <button class="undo-toast-btn" id="undoToastBtn" type="button">Deshacer</button>
+  </div>
+  <div class="update-banner hidden" id="updateBanner" role="status" aria-live="polite">
+    <span class="update-banner-text" id="updateBannerText">Hay una nueva versión disponible.</span>
+    <button class="update-banner-btn" id="updateBannerBtn" type="button">Actualizar</button>
+  </div>
+
+  <!-- Splash screen -->
+  <div id="splashScreen">
+    <div class="splash-circles">
+      <div class="splash-circle"></div>
+      <div class="splash-circle"></div>
+      <div class="splash-circle"></div>
+      <div class="splash-circle"></div>
+      <div class="splash-circle"></div>
+      <div class="splash-circle"></div>
+    </div>
+    <div class="splash-content">
+      <div class="splash-avatar-wrap">
+        <img id="splashAvatar" src="/assets/images/ava_frente.png" alt="AVA">
+      </div>
+      <div class="splash-logo">AVA</div>
+      <div class="splash-subtitle">Asistente Virtual<br>de Auditoría</div>
+    </div>
+  </div>
+
+</body>
+</html>
