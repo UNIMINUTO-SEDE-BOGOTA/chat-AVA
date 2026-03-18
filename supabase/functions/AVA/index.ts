@@ -16,7 +16,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json();
-    console.info("📥 Body completo recibido:", JSON.stringify(body));
+   
 
     // ── Extraer todos los campos relevantes ──────────────────
     const { mensaje, modo, sessionId, proceso, macroproceso, category } = body;
@@ -59,7 +59,7 @@ Deno.serve(async (req: Request) => {
       category:    category     ?? modo ?? "",
     };
 
-    console.info("📤 Payload enviado a n8n:", JSON.stringify(payload));
+   
 
     let response: Response;
     try {
@@ -96,7 +96,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const result = await response.json();
-    console.info("✅ Resultado exitoso:", JSON.stringify(result));
+   
 
     return new Response(
       JSON.stringify(result),
