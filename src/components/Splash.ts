@@ -5,9 +5,9 @@
 // ============================================================
 
 const AVATARS = [
-  '/assets/images/ava_frente.png',
-  '/assets/images/ava_lado.png',
-  '/assets/images/ava_derecha.png',
+  '/ava_frente.png',
+  '/ava_lado.png',
+  '/ava_derecha.png',
 ];
 
 const AVATAR_INTERVAL_MS = 900;

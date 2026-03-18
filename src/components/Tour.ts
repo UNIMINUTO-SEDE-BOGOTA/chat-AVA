@@ -19,7 +19,7 @@ const STEPS: TourStep[] = [
     targetId: 'newChatBtn',
     title: '➕ Nuevo Chat',
     text: 'Crea una nueva conversación en cualquier momento. Cada chat es independiente y se guarda automáticamente.',
-    avatar: '/assets/images/ava-mascota.png',
+    avatar: '/ava-mascota.png',
     needsSidebar: true,
     desktop: { side: 'right', align: 'center' },
     mobile: 'center',
@@ -28,7 +28,7 @@ const STEPS: TourStep[] = [
     targetId: 'chatsList',
     title: '💬 Tus conversaciones',
     text: 'Aquí aparecera tu historial chats. Haz clic en cualquiera para retomarlo, o usa el ícono 🗑 para eliminarlo.',
-    avatar: '/assets/images/ava-mascota.png',
+    avatar: '/ava-mascota.png',
     needsSidebar: true,
     desktop: { side: 'right', align: 'start' },
     mobile: 'center',
@@ -37,7 +37,7 @@ const STEPS: TourStep[] = [
     targetId: 'teamsBtn',
     title: '👩‍💼 Chat En Línea',
     text: 'Si necesitas una asesoría personalizada, este botón te lleva a Microsoft Teams con alguien experto en el tema.',
-    avatar: '/assets/images/ava-mascota.png',
+    avatar: '/ava-mascota.png',
     needsSidebar: true,
     desktop: { side: 'right', align: 'center' },
     mobile: 'center',
@@ -46,7 +46,7 @@ const STEPS: TourStep[] = [
     targetId: 'feedbackBtn',
     title: '⭐ Califica tu experiencia',
     text: 'Tu opinión nos ayuda a mejorar. Usa este formulario para reportar fallas, dar sugerencias o calificar tu experiencia con AVA.',
-    avatar: '/assets/images/ava-mascota.png',
+    avatar: '/ava-mascota.png',
     needsSidebar: true,
     desktop: { side: 'right', align: 'center' },
     mobile: 'center',
@@ -55,7 +55,7 @@ const STEPS: TourStep[] = [
     targetId: 'themeToggleBtn',
     title: '🌙 Tema oscuro',
     text: 'Cambia entre el modo claro y oscuro según tu preferencia. La selección se guarda para tus próximas visitas.',
-    avatar: '/assets/images/ava-mascota.png',
+    avatar: '/ava-mascota.png',
     needsSidebar: false,
     desktop: { side: 'bottom', align: 'end' },
     mobile: 'center',
@@ -64,7 +64,7 @@ const STEPS: TourStep[] = [
     targetId: 'categoriesGrid',
     title: '🧠 Módulos de AVA',
     text: 'Elige un módulo para comenzar: Capacitación SGC, Simulador de Auditorías y más.',
-    avatar: '/assets/images/ava-mascota.png',
+    avatar: '/ava-mascota.png',
     needsSidebar: false,
     desktop: { side: 'top', align: 'center' },
     mobile: 'center',
@@ -73,7 +73,7 @@ const STEPS: TourStep[] = [
     targetId: 'tourReplayBtn',
     title: '❓ Repetir tour',
     text: '¡Eso es todo! Si quieres volver a ver este tour en cualquier momento, haz clic en este botón.',
-    avatar: '/assets/images/ava-mascota.png',
+    avatar: '/ava-mascota.png',
     needsSidebar: false,
     desktop: { side: 'bottom', align: 'end' },
     mobile: 'center',
@@ -138,7 +138,7 @@ function showStep(index: number): void {
   if (avatarEl) {
     avatarEl.style.opacity = '0';
     avatarEl.src = step.avatar;
-    avatarEl.onerror = () => { avatarEl.src = '/assets/images/icon-ava.png'; avatarEl.style.opacity = '1'; };
+    avatarEl.onerror = () => { avatarEl.src = '/icon-ava.png'; avatarEl.style.opacity = '1'; };
     avatarEl.onload  = () => { avatarEl.style.opacity = '1'; };
     if (avatarEl.complete && avatarEl.naturalWidth > 0) avatarEl.style.opacity = '1';
   }

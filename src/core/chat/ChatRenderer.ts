@@ -18,7 +18,7 @@ export function scrollToBottom(containerId = 'messagesContainer'): void {
 
 // ── Typing indicator ──────────────────────────────────────────
 
-export function showTypingIndicator(avatarSrc = './assets/images/icon-ava.png'): void {
+export function showTypingIndicator(avatarSrc = '/icon-ava.png'): void {
   const container = document.getElementById('messagesContainer');
   if (!container || document.getElementById('typingIndicator')) return;
 
@@ -59,7 +59,7 @@ export function renderMessage(message: ChatMessage, labelOverride?: string): voi
   if (message.role === 'user') {
     avatar.textContent = 'TÚ';
   } else {
-    avatar.innerHTML = '<img src="./assets/images/icon-ava.png" alt="AVA">';
+    avatar.innerHTML = '<img src="/icon-ava.png" alt="AVA">';
   }
 
   const body = document.createElement('div');
