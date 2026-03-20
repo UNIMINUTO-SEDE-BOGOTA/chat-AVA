@@ -39,22 +39,44 @@ import {
 export class App {
   private chats: Chat[] = [];
   private currentChatId = '';
-  private isSending = false;
   private pendingDelete: PendingDelete | null = null;
+
+  // ── FIX: isSending ahora es un Set de chat IDs en vez de un
+  //    booleano global. Así cada chat tiene su propio estado de
+  //    "enviando" y cambiar de chat nunca bloquea el input.
+  private sendingChats = new Set<string>();
 
   // ── Init ────────────────────────────────────────────────────
 
   init(): void {
     this.chats = loadChats();
-    if (this.chats.length === 0) {
-      this.createNewChat();
-    } else {
-      this.loadChat(this.chats[0].id);
-    }
 
     this.initComponents();
     this.initInputListeners();
     this.renderWelcomeCards();
+
+    if (this.chats.length === 0) {
+      // Primera vez: crea un chat vacío y muestra la welcome
+      this.createNewChat();
+    } else {
+      // Tiene historial: selecciona el primer chat pero NO lo abre —
+      // solo muestra la pantalla de módulos para que el usuario elija.
+      this.currentChatId = this.chats[0].id;
+      this.renderSidebar();
+      this.showWelcomeScreen();
+    }
+  }
+
+  private showWelcomeScreen(): void {
+    // Muestra la pantalla de módulos y limpia mensajes anteriores
+    document.getElementById('welcomeScreen')?.classList.remove('hidden');
+    const container = document.getElementById('messagesContainer');
+    if (container) {
+      container.querySelectorAll('.message, .process-selection').forEach(el => el.remove());
+    }
+    // El input se oculta en estado welcome — se habilitará cuando
+    // el usuario seleccione un módulo/categoría
+    updateInputState('welcome', false);
   }
 
   private initComponents(): void {
@@ -76,7 +98,7 @@ export class App {
       avaSendProcessSelection(chat, sub, macro, () => this.save()).then(() => {
         renderMessages(chat, avaRenderSpecial);
         this.renderSidebar();
-        updateInputState(chat.state, this.isSending);
+        updateInputState(chat.state, this.isCurrentChatSending());
       });
     });
   }
@@ -101,7 +123,7 @@ export class App {
     sendBtn?.addEventListener('click', () => this.sendMessage());
 
     if (typeof window.visualViewport !== 'undefined') {
-    window.visualViewport?.addEventListener('resize', () => scrollToBottom());
+      window.visualViewport?.addEventListener('resize', () => scrollToBottom());
     }
   }
 
@@ -111,7 +133,6 @@ export class App {
     const grid = document.getElementById('categoriesGrid');
     if (!grid) return;
 
-    // Build cards for each registered service
     let html = '';
     SERVICE_ORDER.forEach(id => {
       const svc = SERVICES[id];
@@ -134,10 +155,8 @@ export class App {
 
     grid.innerHTML = html;
 
-    // Bind AVA category cards
     bindAvaWelcomeCards(grid, (cat) => this.avaOnSelectCategory(cat));
 
-    // Bind other service cards
     grid.querySelectorAll<HTMLButtonElement>('[data-service]').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.service;
@@ -149,7 +168,6 @@ export class App {
   // ── Service routing ──────────────────────────────────────────
 
   private onSelectService(serviceId: string): void {
-    // Extend here when new services are added
     console.log('Service selected:', serviceId);
   }
 
@@ -161,7 +179,7 @@ export class App {
     avaSelectCategory(chat, category, () => this.save());
     renderMessages(chat, avaRenderSpecial);
     this.renderSidebar();
-    updateInputState(chat.state, this.isSending);
+    updateInputState(chat.state, this.isCurrentChatSending());
   }
 
   // ── Message sending ──────────────────────────────────────────
@@ -169,31 +187,64 @@ export class App {
   async sendMessage(): Promise<void> {
     const input = document.getElementById('messageInput') as HTMLTextAreaElement | null;
     const message = input?.value.trim();
-    if (!message || this.isSending) return;
+    if (!message) return;
 
     const chat = this.ensureActiveChat();
     if (!chat) return;
 
-    // Add user message
+    // FIX: bloquea solo si ESTE chat ya está enviando, no cualquiera
+    if (this.sendingChats.has(chat.id)) return;
+
+    // Captura el ID del chat al inicio — si el usuario cambia de chat
+    // mientras se procesa, las actualizaciones se aplican al chat
+    // correcto y no al que esté visible en ese momento.
+    const sendingChatId = chat.id;
+
     chat.messages.push({ role: 'user', content: message, timestamp: new Date().toISOString() });
     maybeUpdateTitle(chat, message);
     if (input) { input.value = ''; adjustInputHeight(); }
 
-    this.isSending = true;
-    updateInputState(chat.state, true);
+    this.sendingChats.add(sendingChatId);
+
+    // Solo bloquea el input si este chat sigue siendo el activo
+    if (this.currentChatId === sendingChatId) {
+      updateInputState(chat.state, true);
+    }
+
     renderMessages(chat, avaRenderSpecial);
     this.save();
     this.renderSidebar();
 
-    // Route to the right service handler
-    if (chat.serviceId === 'ava') {
-      await avaSendMessage(chat, message, () => this.save());
-    }
+    try {
+      if (chat.serviceId === 'ava') {
+        await avaSendMessage(chat, message, () => this.save());
+      }
+    } catch (err) {
+      console.error('Error enviando mensaje:', err);
+      // Agrega un mensaje de error visible en el chat
+      chat.messages.push({
+        role: 'assistant',
+        content: 'Ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.',
+        timestamp: new Date().toISOString(),
+      });
+      this.save();
+    } finally {
+      // FIX: siempre se libera el flag, incluso si hubo error o
+      // el usuario cambió de chat — nunca queda bloqueado
+      this.sendingChats.delete(sendingChatId);
 
-    this.isSending = false;
-    updateInputState(chat.state, false);
-    renderMessages(chat, avaRenderSpecial);
-    this.save();
+      // Actualiza el chat que procesó el mensaje (aunque no sea el activo)
+      const resolvedChat = this.chats.find(c => c.id === sendingChatId);
+      if (resolvedChat) {
+        this.save();
+        // Solo re-renderiza si este chat sigue siendo el visible
+        if (this.currentChatId === sendingChatId) {
+          renderMessages(resolvedChat, avaRenderSpecial);
+          updateInputState(resolvedChat.state, false);
+        }
+        this.renderSidebar();
+      }
+    }
   }
 
   // ── Chat lifecycle ───────────────────────────────────────────
@@ -226,10 +277,16 @@ export class App {
       welcome?.classList.remove('hidden');
     } else {
       welcome?.classList.add('hidden');
+      // Si el chat tiene mensajes pero su estado quedó en 'welcome'
+      // (por el reset de ChatStorage al cargar la app), lo corregimos
+      // aquí para que el input se muestre correctamente.
+      if (chat.state === 'welcome') {
+        chat.state = 'chatting';
+      }
     }
 
     renderMessages(chat, avaRenderSpecial);
-    updateInputState(chat.state, this.isSending);
+    updateInputState(chat.state, this.sendingChats.has(chatId));
     this.renderSidebar();
   }
 
@@ -247,6 +304,9 @@ export class App {
     this.chats = result.chats;
     this.currentChatId = result.newCurrentId;
     this.pendingDelete = result.pending;
+
+    // FIX: limpia el flag de envío si el chat eliminado estaba procesando
+    this.sendingChats.delete(chatId);
 
     this.save();
     this.renderSidebar();
@@ -274,6 +334,11 @@ export class App {
 
   private get currentChat(): Chat | undefined {
     return this.chats.find(c => c.id === this.currentChatId);
+  }
+
+  // FIX: helper que reemplaza el booleano global this.isSending
+  private isCurrentChatSending(): boolean {
+    return this.sendingChats.has(this.currentChatId);
   }
 
   private ensureActiveChat(): Chat {

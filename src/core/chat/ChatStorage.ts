@@ -7,7 +7,8 @@
 import type { Chat } from '../../models/chat';
 import { generateChatId, generateSessionId } from './ChatManager';
 
-const STORAGE_KEY = 'ava_chats';
+const STORAGE_KEY     = 'ava_chats';
+const ACTIVE_CHAT_KEY = 'ava_active_chat';   // ← NO se persiste entre sesiones
 
 export function saveChats(chats: Chat[]): void {
   try {
@@ -26,16 +27,19 @@ export function loadChats(): Chat[] {
     if (!Array.isArray(parsed)) return [];
 
     return parsed.map((chat: Partial<Chat>): Chat => ({
-      id: chat.id ?? generateChatId(),
-      sessionId: chat.sessionId ?? generateSessionId(),
-      title: !chat.title || chat.title === 'Nuevo chat' ? 'Chat' : chat.title,
-      messages: chat.messages ?? [],
-      serviceId: chat.serviceId ?? null,
-      category: chat.category ?? null,
+      id:           chat.id          ?? generateChatId(),
+      sessionId:    chat.sessionId   ?? generateSessionId(),
+      title:        !chat.title || chat.title === 'Nuevo chat' ? 'Chat' : chat.title,
+      messages:     chat.messages    ?? [],
+      serviceId:    chat.serviceId   ?? null,
+      category:     chat.category    ?? null,
       macroproceso: chat.macroproceso ?? null,
-      process: chat.process ?? null,
-      state: chat.state ?? 'welcome',
-      createdAt: chat.createdAt ?? new Date().toISOString(),
+      process:      chat.process     ?? null,
+      // ▼ Siempre arranca en 'welcome' sin importar cómo fue guardado.
+      //   Esto hace que al reabrir la app se muestre la pantalla principal
+      //   con los módulos, no la última conversación activa.
+      state:        'welcome',
+      createdAt:    chat.createdAt   ?? new Date().toISOString(),
     }));
   } catch (e) {
     console.warn('No se pudo parsear chats guardados. Se reinicia el almacenamiento.', e);
@@ -45,4 +49,28 @@ export function loadChats(): Chat[] {
 
 export function clearChats(): void {
   localStorage.removeItem(STORAGE_KEY);
+}
+
+// ── Chat activo en sesión (NO persiste al cerrar) ─────────────
+// Guarda en sessionStorage (no en localStorage) para que al
+// reabrir la pestaña / app no haya ningún chat "activo" previo.
+
+export function saveActiveChat(chatId: string): void {
+  try {
+    sessionStorage.setItem(ACTIVE_CHAT_KEY, chatId);
+  } catch { /* silencioso */ }
+}
+
+export function loadActiveChat(): string | null {
+  try {
+    return sessionStorage.getItem(ACTIVE_CHAT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function clearActiveChat(): void {
+  try {
+    sessionStorage.removeItem(ACTIVE_CHAT_KEY);
+  } catch { /* silencioso */ }
 }

@@ -5,7 +5,7 @@
 // ============================================================
 
 import type { Chat, ChatState } from '../../models/chat';
-import { saveChats } from './ChatStorage';
+import { saveChats, saveActiveChat } from './ChatStorage';
 
 // ── ID generators ────────────────────────────────────────────
 
@@ -125,7 +125,10 @@ export function removeChat(
   };
 }
 
-export function restoreChat(chats: Chat[], pending: PendingDelete): { chats: Chat[]; restoredId: string } {
+export function restoreChat(
+  chats: Chat[],
+  pending: PendingDelete
+): { chats: Chat[]; restoredId: string } {
   let next = [...chats];
 
   if (pending.wasOnlyChat) {
@@ -143,4 +146,13 @@ export function restoreChat(chats: Chat[], pending: PendingDelete): { chats: Cha
 
   saveChats(next);
   return { chats: next, restoredId: restored.id };
+}
+
+// ── Activate chat (session-scoped) ───────────────────────────
+// Llama a esto cada vez que el usuario hace clic en un chat
+// del historial o crea uno nuevo, para que la sesión recuerde
+// cuál era el activo — pero solo hasta cerrar la pestaña.
+
+export function activateChat(chatId: string): void {
+  saveActiveChat(chatId);
 }
