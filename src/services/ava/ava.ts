@@ -93,7 +93,7 @@ export function avaSelectCategory(
   const welcomeMap: Record<string, string> = {
     capacitacion: `👋 ¡Hola! Bienvenida a "${CATEGORY_NAMES.capacitacion}".\n\nPara empezar, escribe: "empecemos".`,
     consulta: `👋 ¡Hola! Aquí puedes resolver dudas sobre ISO 9001:2015.\n\nEscribe tu consulta. Ejemplo: "¿Qué es una no conformidad?".`,
-    default: `👋 Bienvenida al módulo "${CATEGORY_NAMES[category] ?? category}". Para iniciar la simulacion selecciona un macroproceso. ¡Estoy lista para ayudarte.! (No olvides que si quieres cambiar de categoria debes iniciar un nuevo chat.)`,
+    default: `👋 Bienvenida al módulo "${CATEGORY_NAMES[category] ?? category}".Este módulo está diseñado para realizar una preauditoría de tus procesos, que consiste en una simulación de auditoría donde te hare una serie de preguntas relacionadas con el macroproceso que elijas. ¡Empecemos! Selecciona el macroproceso que deseas auditar.(No olvides que si quieres cambiar de categoria debes iniciar un nuevo chat.)`,
   };
 
   chat.messages.push({
