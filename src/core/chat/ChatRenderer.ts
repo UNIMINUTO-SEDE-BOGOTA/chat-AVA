@@ -31,7 +31,7 @@ export function showTypingIndicator(avatarSrc = '/icon-ava.png'): void {
       <div class="message-label">Asistente</div>
       <div class="message-content">
         <div class="blinking-message">
-          <span class="blinking-text">Procesando..</span>
+          <span class="blinking-text">Procesando</span>
           <span class="blinking-dots">...</span>
         </div>
       </div>
